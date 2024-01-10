@@ -139,13 +139,90 @@ def locate_card(cards, query):
     return -1
 
 # Test
-for test in tests:
-    print (locate_card(**test['input']) == test['output'])
+# for test in tests:
+#     print (locate_card(**test['input']) == test['output'])
 
 '''
 At the moment, we're simply going over cards one by one, and not even utilizing the face that they're sorted. This is called a brute force approach.
 It would be great if Bob could somehow guess the card at the first attempt, but with all the cards turned over it's simply impossible to guess the right card.
 The next best idea would be to pick a random card, and use the fact that the list is sorted, to determine whether the target card lies to the left or right of it.
 In fact, if we pick the middle card, we can reduce the number of additional cards to be tested to half the size of the list.
-Then, we can simply repeat the process with each half. This technique is called binary search. 
+Then, we can simply repeat the process with each half. This technique is called binary search.
+Here's how binary search can be applied to our problem:
+    Find the middle element of the list.
+    If it matches queried number, return the middle position as the answer.
+    If it is less than the queried number, then search the first half of the list
+    If it is greater than the queried number, then search the second half of the list
+    If no more elements remain, return -1.
 '''
+
+def test_location(cards, query, mid):
+    if cards[mid] == query:
+        if mid-1 >= 0 and cards[mid-1] == query:
+            return 'left'
+        else:
+            return 'found'
+    elif cards[mid] < query:
+        return 'left'
+    else:
+        return 'right'
+
+def locate_card2(cards, query):
+    lo, hi = 0, len(cards) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        result = test_location(cards, query, mid)
+        if result == 'found':
+            return mid
+        elif result == 'left':
+            hi = mid - 1
+        elif result == 'right':
+            lo = mid + 1
+    return -1
+
+# Test
+# for test in tests:
+#     print (locate_card2(**test['input']) == test['output'])
+
+'''
+Generic Binary Search
+Here is the general strategy behind binary search, which is applicable to a variety of problems:
+    Come up with a condition to determine whether the answer lies before, after or at a given position
+    Retrieve the midpoint and the middle element of the list.
+    If it is the answer, return the middle position as the answer.
+    If answer lies before it, repeat the search with the first half of the list
+    If the answer lies after it, repeat the search with the second half of the list.
+'''
+
+def binary_search(lo, hi, condition):
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        result = condition(mid)
+        if result == 'found':
+            return mid
+        elif result == 'left':
+            hi = mid - 1
+        else:
+            lo = mid + 1
+    return -1
+
+# We can now rewrite the locate_card function more succinctly using the binary_search function.
+def locate_card3(cards, query):
+    
+    def condition(mid):
+        if cards[mid] == query:
+            if mid > 0 and cards[mid-1] == query:
+                return 'left'
+            else:
+                return 'found'
+        elif cards[mid] < query:
+            return 'left'
+        else:
+            return 'right'
+    
+    return binary_search(0, len(cards) - 1, condition)
+
+# Test
+for test in tests:
+    print (locate_card3(**test['input']) == test['output'])
+
