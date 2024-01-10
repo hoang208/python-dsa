@@ -119,3 +119,33 @@ tests.append({
     },
     'output': 2
 })
+
+'''
+Solution
+    Bob can simply turn over cards in order one by one, till he find a card with the given number on it. Here's how we might implement it:
+        Create a variable position with the value 0.
+        Check whether the number at index position in card equals query.
+        If it does, position is the answer and can be returned from the function
+        If not, increment the value of position by 1, and repeat steps 2 to 5 till we reach the last position.
+        If the number was not found, return -1.
+'''
+
+def locate_card(cards, query):
+    position = 0
+    while position < len(cards):
+        if cards[position] == query:
+            return position
+        position += 1
+    return -1
+
+# Test
+for test in tests:
+    print (locate_card(**test['input']) == test['output'])
+
+'''
+At the moment, we're simply going over cards one by one, and not even utilizing the face that they're sorted. This is called a brute force approach.
+It would be great if Bob could somehow guess the card at the first attempt, but with all the cards turned over it's simply impossible to guess the right card.
+The next best idea would be to pick a random card, and use the fact that the list is sorted, to determine whether the target card lies to the left or right of it.
+In fact, if we pick the middle card, we can reduce the number of additional cards to be tested to half the size of the list.
+Then, we can simply repeat the process with each half. This technique is called binary search. 
+'''
